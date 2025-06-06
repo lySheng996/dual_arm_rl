@@ -24,6 +24,7 @@ from . import mdp
 ##
 
 from isaaclab_assets.robots.cartpole import CARTPOLE_CFG  # isort:skip
+from dual_arm_drl.dual_arm_drl.source.dual_arm_drl.dual_arm_drl.assets.config.dual_arm_model import hechuan_dual_arm as DUAL_ARM_CFG  # isort:skip
 
 
 ##
@@ -39,10 +40,11 @@ class DualArmDrlSceneCfg(InteractiveSceneCfg):
     ground = AssetBaseCfg(
         prim_path="/World/ground",
         spawn=sim_utils.GroundPlaneCfg(size=(100.0, 100.0)),
+        init_state=AssetBaseCfg.InitialStateCfg(pos=(0.0, 0.0, 0.0)),
     )
 
     # robot
-    robot: ArticulationCfg = CARTPOLE_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+    robot: ArticulationCfg = DUAL_ARM_CFG.replace(prim_path="{ENV_REGEX_NS}/Humanoid_dual_arm_platform")
 
     # lights
     dome_light = AssetBaseCfg(
@@ -54,7 +56,7 @@ class DualArmDrlSceneCfg(InteractiveSceneCfg):
 ##
 # MDP settings
 ##
-
+class CommadCfg
 
 @configclass
 class ActionsCfg:
