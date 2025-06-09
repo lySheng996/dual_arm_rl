@@ -16,6 +16,7 @@ from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import TerminationTermCfg as DoneTerm
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.utils import configclass
+from isaaclab.utils.noise import AdditiveUniformNoiseCfg as Unoise
 
 from . import mdp
 
@@ -56,13 +57,22 @@ class DualArmDrlSceneCfg(InteractiveSceneCfg):
 ##
 # MDP settings
 ##
-class CommadCfg
+class CommadCfg:
+    ee_pose = mdp.FileBasedPoseCommandCfg(
+        asset_name="robot",
+        body_name="right_end",
+        resampling_time_range=(4.0, 4.0),
+        debug_vis=True,
+        pose_data_file="dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/data/ee_pose_commands.csv",
+        )
 
 @configclass
 class ActionsCfg:
     """Action specifications for the MDP."""
 
-    joint_effort = mdp.JointEffortActionCfg(asset_name="robot", joint_names=["slider_to_cart"], scale=100.0)
+    arm_action = mdp.RelativeJointPositionActionCfg(
+            asset_name="robot", joint_names=["joint_[1-7]"], scale=0.04
+        )
 
 
 @configclass
@@ -74,9 +84,10 @@ class ObservationsCfg:
         """Observations for policy group."""
 
         # observation terms (order preserved)
-        joint_pos_rel = ObsTerm(func=mdp.joint_pos_rel)
-        joint_vel_rel = ObsTerm(func=mdp.joint_vel_rel)
-
+        joint_pos_rel = ObsTerm(func=mdp.joint_pos_rel,noise=Unoise(n_min=-0.01, n_max=0.01))
+        #joint_vel_rel = ObsTerm(func=mdp.joint_vel_rel,noise=Unoise(n_min=-0.01, n_max=0.01))
+        pose_command = ObsTerm(func=mdp.generated_commands, params={"command_name": "right_end"})
+        actions = ObsTerm(func=mdp.last_action)
         def __post_init__(self) -> None:
             self.enable_corruption = False
             self.concatenate_terms = True
@@ -90,23 +101,12 @@ class EventCfg:
     """Configuration for events."""
 
     # reset
-    reset_cart_position = EventTerm(
+    reset_robot_joints = EventTerm(
         func=mdp.reset_joints_by_offset,
         mode="reset",
         params={
-            "asset_cfg": SceneEntityCfg("robot", joint_names=["slider_to_cart"]),
-            "position_range": (-1.0, 1.0),
-            "velocity_range": (-0.5, 0.5),
-        },
-    )
-
-    reset_pole_position = EventTerm(
-        func=mdp.reset_joints_by_offset,
-        mode="reset",
-        params={
-            "asset_cfg": SceneEntityCfg("robot", joint_names=["cart_to_pole"]),
-            "position_range": (-0.25 * math.pi, 0.25 * math.pi),
-            "velocity_range": (-0.25 * math.pi, 0.25 * math.pi),
+            "position_range": (0.5, 1.5),
+            "velocity_range": (0.0, 0.0),
         },
     )
 
