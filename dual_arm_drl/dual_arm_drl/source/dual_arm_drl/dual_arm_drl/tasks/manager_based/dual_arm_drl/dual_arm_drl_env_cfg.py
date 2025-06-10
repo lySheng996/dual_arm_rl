@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 import math
+import numpy as np
 
 import isaaclab.sim as sim_utils
 from isaaclab.assets import ArticulationCfg, AssetBaseCfg
@@ -70,8 +71,8 @@ class CommadCfg:
 class ActionsCfg:
     """Action specifications for the MDP."""
 
-    arm_action = mdp.RelativeJointPositionActionCfg(
-            asset_name="robot", joint_names=["joint_[1-7]"], scale=0.04
+    arm_action = mdp.Jointv2pAction(
+            asset_name="robot", joint_names=["right_j1","right_j2","right_j3","right_j4","right_j5","right_j6","right_j7"]
         )
 
 
@@ -84,8 +85,7 @@ class ObservationsCfg:
         """Observations for policy group."""
 
         # observation terms (order preserved)
-        joint_pos_rel = ObsTerm(func=mdp.joint_pos_rel,noise=Unoise(n_min=-0.01, n_max=0.01))
-        #joint_vel_rel = ObsTerm(func=mdp.joint_vel_rel,noise=Unoise(n_min=-0.01, n_max=0.01))
+        joint_pos_rel = ObsTerm(func=mdp.spec_joint_pos_rel,noise=Unoise(n_min=-0.01, n_max=0.01))
         pose_command = ObsTerm(func=mdp.generated_commands, params={"command_name": "right_end"})
         actions = ObsTerm(func=mdp.last_action)
         def __post_init__(self) -> None:
@@ -102,11 +102,18 @@ class EventCfg:
 
     # reset
     reset_robot_joints = EventTerm(
-        func=mdp.reset_joints_by_offset,
+        func=mdp.reset_spec_joints_by_uniform,
         mode="reset",
         params={
-            "position_range": (0.5, 1.5),
-            "velocity_range": (0.0, 0.0),
+            "position_range":{
+            "right_j1": (-np.pi,np.pi),
+            "right_j2": (-np.pi,np.pi),
+            "right_j3": (-np.pi,np.pi),
+            "right_j4": (0,0.05),
+            "right_j5": (-np.pi,np.pi),
+            "right_j6": (-0.02,0.02),
+            "right_j7": (-0.02,0.02),
+        }
         },
     )
 
