@@ -161,7 +161,7 @@ class Jointv2pAction(JointAction):
 
     def apply_actions(self):
         # add current joint positions to the processed actions
-        current_actions = self.processed_actions + self._asset.data.joint_pos[:, self._joint_ids]
+        current_actions = self.processed_actions - self._asset.data.joint_pos[:, self._joint_ids]
         current_actions = current_actions.clamp(
             self._asset.data.soft_joint_pos_limits[:, self._joint_ids, 0],
             self._asset.data.soft_joint_pos_limits[:, self._joint_ids, 1],

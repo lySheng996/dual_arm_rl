@@ -86,7 +86,7 @@ class ObservationsCfg:
 
         # observation terms (order preserved)
         joint_pos_rel = ObsTerm(func=mdp.spec_joint_pos_rel,noise=Unoise(n_min=-0.01, n_max=0.01))
-        pose_command = ObsTerm(func=mdp.generated_commands, params={"command_name": "right_end"})
+        pose_command = ObsTerm(func=mdp.generated_commands, params={"command_name": "end_pos"})
         actions = ObsTerm(func=mdp.last_action)
         def __post_init__(self) -> None:
             self.enable_corruption = False
@@ -120,12 +120,12 @@ class EventCfg:
 
 @configclass
 class RewardsCfg:
-    """Reward terms for the MDP."""
-
-    # (1) Constant running reward
-    alive = RewTerm(func=mdp.is_alive, weight=1.0)
-    # (2) Failure penalty
-    terminating = RewTerm(func=mdp.is_terminated, weight=-2.0)
+    """位置偏差."""
+    end_effector_position_tracking = RewTerm(
+        func=mdp.position_command_error,
+        weight=-0.2,
+        params={"asset_cfg": SceneEntityCfg("robot", body_names="right_end"), "command_name": "end_pos"},
+    )
     # (3) Primary task: keep pole upright
     pole_pos = RewTerm(
         func=mdp.joint_pos_target_l2,
