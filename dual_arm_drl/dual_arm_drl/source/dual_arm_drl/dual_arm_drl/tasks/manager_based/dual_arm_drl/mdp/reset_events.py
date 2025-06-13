@@ -35,8 +35,9 @@ def reset_spec_joints_by_uniform(
     asset: Articulation = env.scene[asset_cfg.name]
     joint_names = list(position_ranges.keys())
     _joint_ids, _joint_names = asset.find_joints(joint_names)
-    joint_pos_radom = asset.data.default_joint_pos[env_ids].clone()
-    joint_pos_send = asset.data.default_joint_pos[env_ids].clone()
+    joint_pos_radom = asset.data.default_joint_pos[:,_joint_ids].clone()
+    #print("joint_pos_radom shape:", joint_pos_radom.shape)
+    joint_pos_send = asset.data.default_joint_pos[:,_joint_ids].clone()
     # get default joint state
     for i, joint_name in enumerate(joint_names):
         if joint_name in position_ranges:
@@ -46,7 +47,6 @@ def reset_spec_joints_by_uniform(
     for i in range(5):
         joint_pos_radom=joint_pos_radom/5
         joint_pos_send += joint_pos_radom
-        asset.write_root_pose_to_sim(joint_pos_send,_joint_ids,env_ids=env_ids)
-        asset.step()
+        asset.write_joint_position_to_sim(joint_pos_send,_joint_ids)
     # set into the physics simulation
    

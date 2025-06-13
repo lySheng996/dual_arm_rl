@@ -1,0 +1,425 @@
+--- git status ---
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   dual_arm_drl/dual_arm_drl/scripts/rsl_rl/train.py
+	modified:   dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/aseets/config/dual_arm_model.py
+	modified:   dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/__init__.py
+	modified:   dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/dual_arm_drl_env_cfg.py
+	modified:   dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/file_pose_command.py
+	modified:   dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/filecommands_cfg.py
+	modified:   dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/p2v_action.py
+	modified:   dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/p2v_action_cfg.py
+	modified:   dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/reset_events.py
+	modified:   dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/spec_observations.py
+	deleted:    dual_arm_usd
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	IsaacLab/
+	arm_pose_target/
+	dual_arm_drl/dual_arm_drl/scripts/rsl_rl/__pycache__/
+	dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/__pycache__/
+	dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/aseets/config/__pycache__/
+	dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/__pycache__/
+	dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/__pycache__/
+	dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/__pycache__/
+	dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/agents/__pycache__/
+	dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/__pycache__/
+	dual_arm_drl/logs/
+	dual_arm_drl/outputs/
+
+no changes added to commit (use "git add" and/or "git commit -a") 
+
+
+--- git diff ---
+diff --git a/dual_arm_drl/dual_arm_drl/scripts/rsl_rl/train.py b/dual_arm_drl/dual_arm_drl/scripts/rsl_rl/train.py
+index 8dccd0f..a53ccad 100644
+--- a/dual_arm_drl/dual_arm_drl/scripts/rsl_rl/train.py
++++ b/dual_arm_drl/dual_arm_drl/scripts/rsl_rl/train.py
+@@ -92,7 +92,7 @@ import isaaclab_tasks  # noqa: F401
+ from isaaclab_tasks.utils import get_checkpoint_path
+ from isaaclab_tasks.utils.hydra import hydra_task_config
+ 
+-import dual_arm_drl.tasks  # noqa: F401
++import source.dual_arm_drl.dual_arm_drl.tasks  # noqa: F401
+ 
+ torch.backends.cuda.matmul.allow_tf32 = True
+ torch.backends.cudnn.allow_tf32 = True
+diff --git a/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/aseets/config/dual_arm_model.py b/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/aseets/config/dual_arm_model.py
+index 4f4156d..81fde03 100644
+--- a/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/aseets/config/dual_arm_model.py
++++ b/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/aseets/config/dual_arm_model.py
+@@ -37,31 +37,31 @@ hechuan_dual_arm = ArticulationCfg(
+             joint_names_expr=["right_j1","right_j2","right_j3","right_j4","right_j5","right_j6","right_j7"],
+             velocity_limit=1,
+             effort_limit={
+-                "right_r1": 100,
+-                "right_r2": 100,
+-                "right_r3": 100,
+-                "right_r4": 400,
+-                "right_r5": 100,
+-                "right_r6": 200,
+-                "right_r7": 200,
++                "right_j1": 100,
++                "right_j2": 100,
++                "right_j3": 100,
++                "right_j4": 400,
++                "right_j5": 100,
++                "right_j6": 200,
++                "right_j7": 200,
+             },
+             stiffness={
+-                "right_r1": 200,
+-                "right_r2": 200,
+-                "right_r3": 200,
+-                "right_r4": 400,
+-                "right_r5": 200,
+-                "right_r6": 300,
+-                "right_r7": 300,
++                "right_j1": 200,
++                "right_j2": 200,
++                "right_j3": 200,
++                "right_j4": 400,
++                "right_j5": 200,
++                "right_j6": 300,
++                "right_j7": 300,
+             },
+             damping={
+-                "right_r1": 20,
+-                "right_r2": 20,
+-                "right_r3": 20,
+-                "right_r4": 40,
+-                "right_r5": 20,
+-                "right_r6": 30,
+-                "right_r7": 30,
++                "right_j1": 20,
++                "right_j2": 20,
++                "right_j3": 20,
++                "right_j4": 40,
++                "right_j5": 20,
++                "right_j6": 30,
++                "right_j7": 30,
+             },
+         ),
+     },
+diff --git a/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/__init__.py b/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/__init__.py
+index 2766637..9dd7e02 100644
+--- a/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/__init__.py
++++ b/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/__init__.py
+@@ -23,4 +23,17 @@ gym.register(
+         "skrl_cfg_entry_point": f"{agents.__name__}:skrl_ppo_cfg.yaml",
+         "sb3_cfg_entry_point": f"{agents.__name__}:sb3_ppo_cfg.yaml",
+     },
++)
++
++gym.register(
++    id="Template-Dual-Arm-Drl-play-v0",
++    entry_point="isaaclab.envs:ManagerBasedRLEnv",
++    disable_env_checker=True,
++    kwargs={
++        "env_cfg_entry_point": f"{__name__}.dual_arm_drl_env_cfg:DualArmDrlEnvCfg_play",
++        "rl_games_cfg_entry_point": f"{agents.__name__}:rl_games_ppo_cfg.yaml",
++        "rsl_rl_cfg_entry_point": f"{agents.__name__}.rsl_rl_ppo_cfg:PPORunnerCfg",
++        "skrl_cfg_entry_point": f"{agents.__name__}:skrl_ppo_cfg.yaml",
++        "sb3_cfg_entry_point": f"{agents.__name__}:sb3_ppo_cfg.yaml",
++    },
+ )
+\ No newline at end of file
+diff --git a/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/dual_arm_drl_env_cfg.py b/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/dual_arm_drl_env_cfg.py
+index 52b1f9a..dc7b505 100644
+--- a/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/dual_arm_drl_env_cfg.py
++++ b/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/dual_arm_drl_env_cfg.py
+@@ -2,7 +2,10 @@
+ # All rights reserved.
+ #
+ # SPDX-License-Identifier: BSD-3-Clause
++import sys
+ 
++# 追加路径到模块搜索路径末尾
++sys.path.append('/home/user/sly/dual_arm_drl/dual_arm_drl/source')
+ import math
+ import numpy as np
+ 
+@@ -13,6 +16,7 @@ from isaaclab.managers import EventTermCfg as EventTerm
+ from isaaclab.managers import ObservationGroupCfg as ObsGroup
+ from isaaclab.managers import ObservationTermCfg as ObsTerm
+ from isaaclab.managers import RewardTermCfg as RewTerm
++from isaaclab.managers import CurriculumTermCfg as CurrTerm
+ from isaaclab.managers import SceneEntityCfg
+ from isaaclab.managers import TerminationTermCfg as DoneTerm
+ from isaaclab.scene import InteractiveSceneCfg
+@@ -26,7 +30,7 @@ from . import mdp
+ ##
+ 
+ from isaaclab_assets.robots.cartpole import CARTPOLE_CFG  # isort:skip
+-from dual_arm_drl.dual_arm_drl.source.dual_arm_drl.dual_arm_drl.assets.config.dual_arm_model import hechuan_dual_arm as DUAL_ARM_CFG  # isort:skip
++from dual_arm_drl.dual_arm_drl.aseets.config.dual_arm_model import hechuan_dual_arm as DUAL_ARM_CFG  # isort:skip
+ 
+ 
+ ##
+@@ -58,20 +62,21 @@ class DualArmDrlSceneCfg(InteractiveSceneCfg):
+ ##
+ # MDP settings
+ ##
+-class CommadCfg:
+-    ee_pose = mdp.FileBasedPoseCommandCfg(
++@configclass
++class CommandCfg:
++    end_pose = mdp.FileBasedPoseCommandCfg(
+         asset_name="robot",
+         body_name="right_end",
+         resampling_time_range=(4.0, 4.0),
+         debug_vis=True,
+-        pose_data_file="dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/data/ee_pose_commands.csv",
++        pose_data_file="/home/user/sly/arm_pose_target/ee_pose_commands.csv",
+         )
+ 
+ @configclass
+ class ActionsCfg:
+     """Action specifications for the MDP."""
+ 
+-    arm_action = mdp.Jointv2pAction(
++    arm_action = mdp.JointV2PActionCfg(
+             asset_name="robot", joint_names=["right_j1","right_j2","right_j3","right_j4","right_j5","right_j6","right_j7"]
+         )
+ 
+@@ -86,7 +91,7 @@ class ObservationsCfg:
+ 
+         # observation terms (order preserved)
+         joint_pos_rel = ObsTerm(func=mdp.spec_joint_pos_rel,noise=Unoise(n_min=-0.01, n_max=0.01))
+-        pose_command = ObsTerm(func=mdp.generated_commands, params={"command_name": "end_pos"})
++        pose_command = ObsTerm(func=mdp.generated_commands, params={"command_name": "end_pose"})
+         actions = ObsTerm(func=mdp.last_action)
+         def __post_init__(self) -> None:
+             self.enable_corruption = False
+@@ -105,7 +110,7 @@ class EventCfg:
+         func=mdp.reset_spec_joints_by_uniform,
+         mode="reset",
+         params={
+-            "position_range":{
++            "position_ranges":{
+             "right_j1": (-np.pi,np.pi),
+             "right_j2": (-np.pi,np.pi),
+             "right_j3": (-np.pi,np.pi),
+@@ -124,26 +129,19 @@ class RewardsCfg:
+     end_effector_position_tracking = RewTerm(
+         func=mdp.position_command_error,
+         weight=-0.2,
+-        params={"asset_cfg": SceneEntityCfg("robot", body_names="right_end"), "command_name": "end_pos"},
+-    )
+-    # (3) Primary task: keep pole upright
+-    pole_pos = RewTerm(
+-        func=mdp.joint_pos_target_l2,
+-        weight=-1.0,
+-        params={"asset_cfg": SceneEntityCfg("robot", joint_names=["cart_to_pole"]), "target": 0.0},
++        params={"asset_cfg": SceneEntityCfg("robot", body_names="right_end"), "command_name": "end_pose"},
+     )
+-    # (4) Shaping tasks: lower cart velocity
+-    cart_vel = RewTerm(
+-        func=mdp.joint_vel_l1,
+-        weight=-0.01,
+-        params={"asset_cfg": SceneEntityCfg("robot", joint_names=["slider_to_cart"])},
++    end_effector_position_tracking_fine_grained = RewTerm(
++        func=mdp.position_command_error_tanh,
++        weight=0.1,
++        params={"asset_cfg": SceneEntityCfg("robot", body_names="right_end"), "std": 0.1, "command_name": "end_pose"},
+     )
+-    # (5) Shaping tasks: lower pole angular velocity
+-    pole_vel = RewTerm(
+-        func=mdp.joint_vel_l1,
+-        weight=-0.005,
+-        params={"asset_cfg": SceneEntityCfg("robot", joint_names=["cart_to_pole"])},
++    end_effector_orientation_tracking = RewTerm(
++        func=mdp.orientation_command_error,
++        weight=-0.1,
++        params={"asset_cfg": SceneEntityCfg("robot", body_names="right_end"), "command_name": "end_pose"},
+     )
++    action_rate = RewTerm(func=mdp.action_rate_l2, weight=-0.0001)
+ 
+ 
+ @configclass
+@@ -152,10 +150,13 @@ class TerminationsCfg:
+ 
+     # (1) Time out
+     time_out = DoneTerm(func=mdp.time_out, time_out=True)
+-    # (2) Cart out of bounds
+-    cart_out_of_bounds = DoneTerm(
+-        func=mdp.joint_pos_out_of_manual_limit,
+-        params={"asset_cfg": SceneEntityCfg("robot", joint_names=["slider_to_cart"]), "bounds": (-3.0, 3.0)},
++
++@configclass
++class CurriculumCfg:
++    """Curriculum terms for the MDP."""
++
++    action_rate = CurrTerm(
++        func=mdp.modify_reward_weight, params={"term_name": "action_rate", "weight": -0.005, "num_steps": 4500}
+     )
+ 
+ 
+@@ -171,6 +172,7 @@ class DualArmDrlEnvCfg(ManagerBasedRLEnvCfg):
+     # Basic settings
+     observations: ObservationsCfg = ObservationsCfg()
+     actions: ActionsCfg = ActionsCfg()
++    commands: CommandCfg = CommandCfg()
+     events: EventCfg = EventCfg()
+     # MDP settings
+     rewards: RewardsCfg = RewardsCfg()
+@@ -181,9 +183,20 @@ class DualArmDrlEnvCfg(ManagerBasedRLEnvCfg):
+         """Post initialization."""
+         # general settings
+         self.decimation = 2
+-        self.episode_length_s = 5
++        self.episode_length_s = 12
+         # viewer settings
+-        self.viewer.eye = (8.0, 0.0, 5.0)
++        self.viewer.eye = (3.5, 3.5, 3.5)
+         # simulation settings
+-        self.sim.dt = 1 / 120
+-        self.sim.render_interval = self.decimation
+\ No newline at end of file
++        self.sim.dt = 1 / 60
++        self.sim.render_interval = self.decimation
++
++class DualArmDrlEnvCfg_play(DualArmDrlEnvCfg):
++    def __post_init__(self):
++        # post init of parent
++        super().__post_init__()
++        # make a smaller scene for play
++        self.scene.num_envs = 50
++        self.scene.env_spacing = 2.5
++        self.scene.replicate_physics=False
++        # disable randomization for play
++        self.observations.policy.enable_corruption = False
+\ No newline at end of file
+diff --git a/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/file_pose_command.py b/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/file_pose_command.py
+index e1189c4..121fcd8 100644
+--- a/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/file_pose_command.py
++++ b/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/file_pose_command.py
+@@ -20,7 +20,7 @@ class FileBasedPoseCommand(CommandTerm):
+ 
+     cfg: FilePoseCommandCfg
+ 
+-    def __init__(self, cfg: FilePoseCommandCfg, env: ManagerBasedEnv, file_path: str):
++    def __init__(self, cfg: FilePoseCommandCfg, env: ManagerBasedEnv):
+         super().__init__(cfg, env)
+ 
+         self.robot: Articulation = env.scene[cfg.asset_name]
+@@ -42,6 +42,7 @@ class FileBasedPoseCommand(CommandTerm):
+         msg += f"\tResampling time range: {self.cfg.resampling_time_range}\n"
+         return msg
+     
++    @property
+     def command(self) -> torch.Tensor:
+         """The desired pose command. Shape is (num_envs, 7).
+ 
+diff --git a/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/filecommands_cfg.py b/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/filecommands_cfg.py
+index 7bad851..e148365 100644
+--- a/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/filecommands_cfg.py
++++ b/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/filecommands_cfg.py
+@@ -8,6 +8,7 @@ from isaaclab.utils import configclass
+ 
+ from .file_pose_command import FileBasedPoseCommand
+ 
++@configclass
+ class FileBasedPoseCommandCfg(CommandTermCfg):
+     """Configuration for file-based pose command generator."""
+ 
+diff --git a/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/p2v_action.py b/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/p2v_action.py
+index 6c000b2..9002965 100644
+--- a/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/p2v_action.py
++++ b/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/p2v_action.py
+@@ -10,12 +10,14 @@ import isaaclab.utils.string as string_utils
+ from isaaclab.assets.articulation import Articulation
+ from isaaclab.managers.action_manager import ActionTerm
+ from isaaclab.managers import SceneEntityCfg
++from isaaclab.utils import configclass
+ 
+ if TYPE_CHECKING:
+     from isaaclab.envs import ManagerBasedEnv
+ 
+     from . import p2v_action_cfg
+ 
++
+ class JointAction(ActionTerm):
+     r"""Base class for joint actions.
+ 
+@@ -144,18 +146,9 @@ class Jointv2pAction(JointAction):
+         if cfg.use_zero_offset:
+             self._offset = 0.0
+ 
+-    def position_to_velocity(position: torch.Tensor, max_speed: torch.Tensor, k=1.0):
++    def position_to_velocity(self,position: torch.Tensor, max_speed: torch.Tensor, k:float):
+     # """
+     # 位置指令映射为速度指令，支持 max_speed 为张量（每个通道/关节不同的饱和速度）
+-    
+-    # 参数：
+-    # - position: (..., N)
+-    # - max_speed: (..., N) or (N,)
+-    # - k: 弹性系数
+-    
+-    # 返回：
+-    # - velocity: (..., N)
+-    # """
+         return max_speed * torch.tanh(k * position)
+ 
+ 
+diff --git a/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/p2v_action_cfg.py b/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/p2v_action_cfg.py
+index b5b8e7e..1cc3b09 100644
+--- a/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/p2v_action_cfg.py
++++ b/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/p2v_action_cfg.py
+@@ -25,6 +25,7 @@ class JointActionCfg(ActionTermCfg):
+     offset: float | dict[str, float] = 0.0
+     """Offset factor for the action (float or dict of regex expressions). Defaults to 0.0."""
+ 
++@configclass
+ class JointV2PActionCfg(JointActionCfg):
+     """Configuration for the joint position action term.
+ 
+diff --git a/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/reset_events.py b/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/reset_events.py
+index 4a0927b..8735c60 100644
+--- a/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/reset_events.py
++++ b/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/reset_events.py
+@@ -35,8 +35,9 @@ def reset_spec_joints_by_uniform(
+     asset: Articulation = env.scene[asset_cfg.name]
+     joint_names = list(position_ranges.keys())
+     _joint_ids, _joint_names = asset.find_joints(joint_names)
+-    joint_pos_radom = asset.data.default_joint_pos[env_ids].clone()
+-    joint_pos_send = asset.data.default_joint_pos[env_ids].clone()
++    joint_pos_radom = asset.data.default_joint_pos[:,_joint_ids].clone()
++    #print("joint_pos_radom shape:", joint_pos_radom.shape)
++    joint_pos_send = asset.data.default_joint_pos[:,_joint_ids].clone()
+     # get default joint state
+     for i, joint_name in enumerate(joint_names):
+         if joint_name in position_ranges:
+@@ -46,7 +47,6 @@ def reset_spec_joints_by_uniform(
+     for i in range(5):
+         joint_pos_radom=joint_pos_radom/5
+         joint_pos_send += joint_pos_radom
+-        asset.write_root_pose_to_sim(joint_pos_send,_joint_ids,env_ids=env_ids)
+-        asset.step()
++        asset.write_joint_position_to_sim(joint_pos_send,_joint_ids)
+     # set into the physics simulation
+    
+diff --git a/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/spec_observations.py b/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/spec_observations.py
+index 968e573..7bf52cb 100644
+--- a/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/spec_observations.py
++++ b/dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/spec_observations.py
+@@ -1,6 +1,6 @@
+-from dataclasses import MISSING
+ from __future__ import annotations
+ 
++from dataclasses import MISSING
+ import torch
+ from typing import TYPE_CHECKING
+ 
+diff --git a/dual_arm_usd b/dual_arm_usd
+deleted file mode 160000
+index 1c1a88a..0000000
+--- a/dual_arm_usd
++++ /dev/null
+@@ -1 +0,0 @@
+-Subproject commit 1c1a88abe30446e6d3ed1ed9889b5b7f117eceed

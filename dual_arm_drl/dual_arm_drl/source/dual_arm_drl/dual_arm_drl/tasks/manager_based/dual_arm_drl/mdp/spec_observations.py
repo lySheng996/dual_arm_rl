@@ -1,6 +1,6 @@
-from dataclasses import MISSING
 from __future__ import annotations
 
+from dataclasses import MISSING
 import torch
 from typing import TYPE_CHECKING
 
@@ -24,4 +24,5 @@ def spec_joint_pos_rel(env: ManagerBasedEnv, asset_cfg: SceneEntityCfg = SceneEn
     _asset: Articulation = env.scene[asset_cfg.name]
     asset_cfg.joint_ids
     _joint_ids, _joint_names = _asset.find_joints(joint_names)
+    print("joint_pos_observation :", _asset.data.joint_pos[:, _joint_ids])
     return _asset.data.joint_pos[:, _joint_ids] - _asset.data.default_joint_pos[:,  _joint_ids]

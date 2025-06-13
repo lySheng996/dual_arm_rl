@@ -25,6 +25,7 @@ class JointActionCfg(ActionTermCfg):
     offset: float | dict[str, float] = 0.0
     """Offset factor for the action (float or dict of regex expressions). Defaults to 0.0."""
 
+@configclass
 class JointV2PActionCfg(JointActionCfg):
     """Configuration for the joint position action term.
 

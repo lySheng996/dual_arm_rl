@@ -2,7 +2,10 @@
 # All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
+import sys
 
+# 追加路径到模块搜索路径末尾
+sys.path.append('/home/user/sly/dual_arm_drl/dual_arm_drl/source')
 import math
 import numpy as np
 
@@ -13,6 +16,7 @@ from isaaclab.managers import EventTermCfg as EventTerm
 from isaaclab.managers import ObservationGroupCfg as ObsGroup
 from isaaclab.managers import ObservationTermCfg as ObsTerm
 from isaaclab.managers import RewardTermCfg as RewTerm
+from isaaclab.managers import CurriculumTermCfg as CurrTerm
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import TerminationTermCfg as DoneTerm
 from isaaclab.scene import InteractiveSceneCfg
@@ -26,7 +30,7 @@ from . import mdp
 ##
 
 from isaaclab_assets.robots.cartpole import CARTPOLE_CFG  # isort:skip
-from dual_arm_drl.dual_arm_drl.source.dual_arm_drl.dual_arm_drl.assets.config.dual_arm_model import hechuan_dual_arm as DUAL_ARM_CFG  # isort:skip
+from dual_arm_drl.dual_arm_drl.aseets.config.dual_arm_model import hechuan_dual_arm as DUAL_ARM_CFG  # isort:skip
 
 
 ##
@@ -58,20 +62,21 @@ class DualArmDrlSceneCfg(InteractiveSceneCfg):
 ##
 # MDP settings
 ##
-class CommadCfg:
-    ee_pose = mdp.FileBasedPoseCommandCfg(
+@configclass
+class CommandCfg:
+    end_pose = mdp.FileBasedPoseCommandCfg(
         asset_name="robot",
         body_name="right_end",
         resampling_time_range=(4.0, 4.0),
         debug_vis=True,
-        pose_data_file="dual_arm_drl/dual_arm_drl/source/dual_arm_drl/dual_arm_drl/tasks/manager_based/dual_arm_drl/mdp/data/ee_pose_commands.csv",
+        pose_data_file="/home/user/sly/arm_pose_target/ee_pose_commands.csv",
         )
 
 @configclass
 class ActionsCfg:
     """Action specifications for the MDP."""
 
-    arm_action = mdp.Jointv2pAction(
+    arm_action = mdp.JointV2PActionCfg(
             asset_name="robot", joint_names=["right_j1","right_j2","right_j3","right_j4","right_j5","right_j6","right_j7"]
         )
 
@@ -86,7 +91,7 @@ class ObservationsCfg:
 
         # observation terms (order preserved)
         joint_pos_rel = ObsTerm(func=mdp.spec_joint_pos_rel,noise=Unoise(n_min=-0.01, n_max=0.01))
-        pose_command = ObsTerm(func=mdp.generated_commands, params={"command_name": "end_pos"})
+        pose_command = ObsTerm(func=mdp.generated_commands, params={"command_name": "end_pose"})
         actions = ObsTerm(func=mdp.last_action)
         def __post_init__(self) -> None:
             self.enable_corruption = False
@@ -105,7 +110,7 @@ class EventCfg:
         func=mdp.reset_spec_joints_by_uniform,
         mode="reset",
         params={
-            "position_range":{
+            "position_ranges":{
             "right_j1": (-np.pi,np.pi),
             "right_j2": (-np.pi,np.pi),
             "right_j3": (-np.pi,np.pi),
@@ -124,26 +129,19 @@ class RewardsCfg:
     end_effector_position_tracking = RewTerm(
         func=mdp.position_command_error,
         weight=-0.2,
-        params={"asset_cfg": SceneEntityCfg("robot", body_names="right_end"), "command_name": "end_pos"},
+        params={"asset_cfg": SceneEntityCfg("robot", body_names="right_end"), "command_name": "end_pose"},
     )
-    # (3) Primary task: keep pole upright
-    pole_pos = RewTerm(
-        func=mdp.joint_pos_target_l2,
-        weight=-1.0,
-        params={"asset_cfg": SceneEntityCfg("robot", joint_names=["cart_to_pole"]), "target": 0.0},
+    end_effector_position_tracking_fine_grained = RewTerm(
+        func=mdp.position_command_error_tanh,
+        weight=0.1,
+        params={"asset_cfg": SceneEntityCfg("robot", body_names="right_end"), "std": 0.1, "command_name": "end_pose"},
     )
-    # (4) Shaping tasks: lower cart velocity
-    cart_vel = RewTerm(
-        func=mdp.joint_vel_l1,
-        weight=-0.01,
-        params={"asset_cfg": SceneEntityCfg("robot", joint_names=["slider_to_cart"])},
+    end_effector_orientation_tracking = RewTerm(
+        func=mdp.orientation_command_error,
+        weight=-0.1,
+        params={"asset_cfg": SceneEntityCfg("robot", body_names="right_end"), "command_name": "end_pose"},
     )
-    # (5) Shaping tasks: lower pole angular velocity
-    pole_vel = RewTerm(
-        func=mdp.joint_vel_l1,
-        weight=-0.005,
-        params={"asset_cfg": SceneEntityCfg("robot", joint_names=["cart_to_pole"])},
-    )
+    action_rate = RewTerm(func=mdp.action_rate_l2, weight=-0.0001)
 
 
 @configclass
@@ -152,10 +150,13 @@ class TerminationsCfg:
 
     # (1) Time out
     time_out = DoneTerm(func=mdp.time_out, time_out=True)
-    # (2) Cart out of bounds
-    cart_out_of_bounds = DoneTerm(
-        func=mdp.joint_pos_out_of_manual_limit,
-        params={"asset_cfg": SceneEntityCfg("robot", joint_names=["slider_to_cart"]), "bounds": (-3.0, 3.0)},
+
+@configclass
+class CurriculumCfg:
+    """Curriculum terms for the MDP."""
+
+    action_rate = CurrTerm(
+        func=mdp.modify_reward_weight, params={"term_name": "action_rate", "weight": -0.005, "num_steps": 4500}
     )
 
 
@@ -171,6 +172,7 @@ class DualArmDrlEnvCfg(ManagerBasedRLEnvCfg):
     # Basic settings
     observations: ObservationsCfg = ObservationsCfg()
     actions: ActionsCfg = ActionsCfg()
+    commands: CommandCfg = CommandCfg()
     events: EventCfg = EventCfg()
     # MDP settings
     rewards: RewardsCfg = RewardsCfg()
@@ -181,9 +183,20 @@ class DualArmDrlEnvCfg(ManagerBasedRLEnvCfg):
         """Post initialization."""
         # general settings
         self.decimation = 2
-        self.episode_length_s = 5
+        self.episode_length_s = 12
         # viewer settings
-        self.viewer.eye = (8.0, 0.0, 5.0)
+        self.viewer.eye = (3.5, 3.5, 3.5)
         # simulation settings
-        self.sim.dt = 1 / 120
+        self.sim.dt = 1 / 60
         self.sim.render_interval = self.decimation
+
+class DualArmDrlEnvCfg_play(DualArmDrlEnvCfg):
+    def __post_init__(self):
+        # post init of parent
+        super().__post_init__()
+        # make a smaller scene for play
+        self.scene.num_envs = 50
+        self.scene.env_spacing = 2.5
+        self.scene.replicate_physics=False
+        # disable randomization for play
+        self.observations.policy.enable_corruption = False

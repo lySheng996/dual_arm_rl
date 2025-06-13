@@ -8,6 +8,7 @@ from isaaclab.utils import configclass
 
 from .file_pose_command import FileBasedPoseCommand
 
+@configclass
 class FileBasedPoseCommandCfg(CommandTermCfg):
     """Configuration for file-based pose command generator."""
 

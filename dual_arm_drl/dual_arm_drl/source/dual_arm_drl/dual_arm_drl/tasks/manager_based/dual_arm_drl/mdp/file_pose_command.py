@@ -20,7 +20,7 @@ class FileBasedPoseCommand(CommandTerm):
 
     cfg: FilePoseCommandCfg
 
-    def __init__(self, cfg: FilePoseCommandCfg, env: ManagerBasedEnv, file_path: str):
+    def __init__(self, cfg: FilePoseCommandCfg, env: ManagerBasedEnv):
         super().__init__(cfg, env)
 
         self.robot: Articulation = env.scene[cfg.asset_name]
@@ -42,6 +42,7 @@ class FileBasedPoseCommand(CommandTerm):
         msg += f"\tResampling time range: {self.cfg.resampling_time_range}\n"
         return msg
     
+    @property
     def command(self) -> torch.Tensor:
         """The desired pose command. Shape is (num_envs, 7).
 
@@ -73,6 +74,7 @@ class FileBasedPoseCommand(CommandTerm):
         # 如果需要确保 quaternion 实部为正
         if self.cfg.make_quat_unique:
             poses[:, 3:] = quat_unique(poses[:, 3:])
+        print("poses:",poses)
         self.pose_command_b[env_ids] = poses
     
     def _update_command(self):

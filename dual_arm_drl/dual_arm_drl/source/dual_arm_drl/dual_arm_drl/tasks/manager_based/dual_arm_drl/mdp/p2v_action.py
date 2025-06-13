@@ -10,11 +10,13 @@ import isaaclab.utils.string as string_utils
 from isaaclab.assets.articulation import Articulation
 from isaaclab.managers.action_manager import ActionTerm
 from isaaclab.managers import SceneEntityCfg
+from isaaclab.utils import configclass
 
 if TYPE_CHECKING:
     from isaaclab.envs import ManagerBasedEnv
 
     from . import p2v_action_cfg
+
 
 class JointAction(ActionTerm):
     r"""Base class for joint actions.
@@ -144,18 +146,9 @@ class Jointv2pAction(JointAction):
         if cfg.use_zero_offset:
             self._offset = 0.0
 
-    def position_to_velocity(position: torch.Tensor, max_speed: torch.Tensor, k=1.0):
+    def position_to_velocity(self,position: torch.Tensor, max_speed: torch.Tensor, k:float):
     # """
     # 位置指令映射为速度指令，支持 max_speed 为张量（每个通道/关节不同的饱和速度）
-    
-    # 参数：
-    # - position: (..., N)
-    # - max_speed: (..., N) or (N,)
-    # - k: 弹性系数
-    
-    # 返回：
-    # - velocity: (..., N)
-    # """
         return max_speed * torch.tanh(k * position)
 
 
@@ -169,4 +162,5 @@ class Jointv2pAction(JointAction):
         max_speed = torch.tensor([1.0, 1.0, 1.0,0.02,1.0,0.01,0.01],device=self.device)
         current_actions = self.position_to_velocity(current_actions, max_speed, k=1.0)
         # set position targets
+        print("apply_actions: current_actions:", current_actions)
         self._asset.set_joint_position_target(current_actions, joint_ids=self._joint_ids)
