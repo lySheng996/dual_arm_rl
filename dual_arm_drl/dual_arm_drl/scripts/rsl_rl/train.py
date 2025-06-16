@@ -9,6 +9,7 @@
 
 import argparse
 import sys
+sys.path.append('/home/user/sly/dual_arm_drl/dual_arm_drl/source')
 
 from isaaclab.app import AppLauncher
 
@@ -92,7 +93,7 @@ import isaaclab_tasks  # noqa: F401
 from isaaclab_tasks.utils import get_checkpoint_path
 from isaaclab_tasks.utils.hydra import hydra_task_config
 
-import source.dual_arm_drl.dual_arm_drl.tasks  # noqa: F401
+import dual_arm_drl.dual_arm_drl.tasks  # noqa: F401
 
 torch.backends.cuda.matmul.allow_tf32 = True
 torch.backends.cudnn.allow_tf32 = True

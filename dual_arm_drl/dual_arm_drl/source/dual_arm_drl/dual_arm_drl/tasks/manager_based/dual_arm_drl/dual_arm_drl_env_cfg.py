@@ -119,7 +119,7 @@ class EventCfg:
             "right_j6": (-0.02,0.02),
             "right_j7": (-0.02,0.02),
         }
-        },
+       },
     )
 
 
@@ -142,6 +142,16 @@ class RewardsCfg:
         params={"asset_cfg": SceneEntityCfg("robot", body_names="right_end"), "command_name": "end_pose"},
     )
     action_rate = RewTerm(func=mdp.action_rate_l2, weight=-0.0001)
+    "曲面能量"
+    # surface_energy = RewTerm(
+    #     func=mdp.surface_energy,
+    #     weight=-0.0001,
+    #     params={
+    #         "asset_cfg": SceneEntityCfg("robot", body_names={"right_joint1","right_joint2","right_joint3","right_link2","right_joint5","right_link3","right_end"}),
+    #         "command_name": "end_pose",
+    #         "std": 0.1,
+    #     },
+    # )
 
 
 @configclass

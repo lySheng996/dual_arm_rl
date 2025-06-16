@@ -74,7 +74,7 @@ class FileBasedPoseCommand(CommandTerm):
         # 如果需要确保 quaternion 实部为正
         if self.cfg.make_quat_unique:
             poses[:, 3:] = quat_unique(poses[:, 3:])
-        print("poses:",poses)
+        # print("poses:",poses)
         self.pose_command_b[env_ids] = poses
     
     def _update_command(self):

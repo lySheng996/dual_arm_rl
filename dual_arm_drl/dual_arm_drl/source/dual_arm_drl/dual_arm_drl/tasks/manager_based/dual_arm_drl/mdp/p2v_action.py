@@ -159,8 +159,14 @@ class Jointv2pAction(JointAction):
             self._asset.data.soft_joint_pos_limits[:, self._joint_ids, 0],
             self._asset.data.soft_joint_pos_limits[:, self._joint_ids, 1],
         )
-        max_speed = torch.tensor([1.0, 1.0, 1.0,0.02,1.0,0.01,0.01],device=self.device)
+        max_speed = torch.tensor([0.002, 0.002,0.002,0.002,0.002,0.001,0.001],device=self.device)
         current_actions = self.position_to_velocity(current_actions, max_speed, k=1.0)
+        # print("apply_actions: change_current_actions:", current_actions)
+        current_actions +=self._asset.data.joint_pos[:, self._joint_ids]
         # set position targets
-        print("apply_actions: current_actions:", current_actions)
+        # print("apply_actions: joint_ids:", self._joint_ids)
+        # print("apply_actions: pos_rel_0:",self._asset.data.joint_pos[:, self._joint_ids])
+        # print("apply_actions: current_actions:", current_actions)
+
         self._asset.set_joint_position_target(current_actions, joint_ids=self._joint_ids)
+        # print("apply_actions: pos_rel_1:", self._asset.data.joint_pos[:, self._joint_ids])

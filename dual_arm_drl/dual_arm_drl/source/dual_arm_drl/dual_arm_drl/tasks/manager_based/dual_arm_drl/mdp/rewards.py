@@ -6,8 +6,10 @@
 from __future__ import annotations
 
 import torch
+import torch.nn.functional as F
 from typing import TYPE_CHECKING
 
+from scipy.spatial.transform import Rotation as R
 from isaaclab.assets import Articulation , RigidObject
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.sensors import FrameTransformer
@@ -73,8 +75,13 @@ def position_command_error(env: ManagerBasedRLEnv, command_name: str, asset_cfg:
     command = env.command_manager.get_command(command_name)
     # obtain the desired and current positions
     des_pos_b = command[:, :3]
-    des_pos_w, _ = combine_frame_transforms(asset.data.root_state_w[:, :3], asset.data.root_state_w[:, 3:7], des_pos_b)
-    curr_pos_w = asset.data.body_state_w[:, asset_cfg.body_ids[0], :3]  # type: ignore
+    des_pos_w=des_pos_b
+    
+    end_body_ids=asset.find_bodies(asset_cfg.body_names)[0][0]  # type: ignore
+    base_body_ids=asset.find_bodies("arms_bracket")[0][0]  # type: ignore
+    # des_pos_w, _ = combine_frame_transforms(asset.data.root_state_w[:, :3], asset.data.root_state_w[:, 3:7], des_pos_b)
+    curr_pos_w = asset.data.body_state_w[:, end_body_ids, :3]-asset.data.body_state_w[:, base_body_ids, :3]  # type: ignore
+    # print(f"body_name:{asset_cfg.body_names},des_pos_b:{des_pos_b},des_pos_w: {des_pos_w},curr_pos_w: {curr_pos_w}")
     return torch.norm(curr_pos_w - des_pos_w, dim=1)
 
 
@@ -91,11 +98,27 @@ def position_command_error_tanh(
     command = env.command_manager.get_command(command_name)
     # obtain the desired and current positions
     des_pos_b = command[:, :3]
-    des_pos_w, _ = combine_frame_transforms(asset.data.root_state_w[:, :3], asset.data.root_state_w[:, 3:7], des_pos_b)
-    curr_pos_w = asset.data.body_state_w[:, asset_cfg.body_ids[0], :3]  # type: ignore
+    des_pos_w=des_pos_b
+    end_body_ids=asset.find_bodies(asset_cfg.body_names)[0][0]  # type: ignore
+    base_body_ids=asset.find_bodies("arms_bracket")[0][0]  # type: ignore
+    # des_pos_w, _ = combine_frame_transforms(asset.data.root_state_w[:, :3], asset.data.root_state_w[:, 3:7], des_pos_b)
+    curr_pos_w = asset.data.body_state_w[:, end_body_ids, :3]-asset.data.body_state_w[:, base_body_ids, :3]  # type: ignore
     distance = torch.norm(curr_pos_w - des_pos_w, dim=1)
     return 1 - torch.tanh(distance / std)
 
+def relative_quat(end_q, base_q):
+    # both inputs: (..., 4), format [x, y, z, w], device agnostic
+    base_q_conj = base_q.clone()
+    base_q_conj[..., :3] *= -1
+    base_inv = base_q_conj / base_q.norm(dim=-1, keepdim=True)**2
+    x1, y1, z1, w1 = base_inv.unbind(-1)
+    x2, y2, z2, w2 = end_q.unbind(-1)
+    return torch.stack([
+        w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2,
+        w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2,
+        w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2,
+        w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2
+    ], dim=-1)
 
 def orientation_command_error(env: ManagerBasedRLEnv, command_name: str, asset_cfg: SceneEntityCfg) -> torch.Tensor:
     """Penalize tracking orientation error using shortest path.
@@ -109,6 +132,11 @@ def orientation_command_error(env: ManagerBasedRLEnv, command_name: str, asset_c
     command = env.command_manager.get_command(command_name)
     # obtain the desired and current orientations
     des_quat_b = command[:, 3:7]
-    des_quat_w = quat_mul(asset.data.root_state_w[:, 3:7], des_quat_b)
-    curr_quat_w = asset.data.body_state_w[:, asset_cfg.body_ids[0], 3:7]  # type: ignore
+    des_quat_w=des_quat_b
+    end_body_ids=asset.find_bodies(asset_cfg.body_names)[0][0]  # type: ignore
+    base_body_ids=asset.find_bodies("arms_bracket")[0][0]  # type: ignore
+    # des_quat_w = quat_mul(asset.data.root_state_w[:, 3:7], des_quat_b)
+    end_curr_quat_w = asset.data.body_state_w[:, end_body_ids, 3:7]  # type: ignore
+    base_curr_quat_w = asset.data.body_state_w[:, base_body_ids, 3:7]  # type: ignore
+    curr_quat_w = relative_quat(end_curr_quat_w, base_curr_quat_w)
     return quat_error_magnitude(curr_quat_w, des_quat_w)

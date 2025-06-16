@@ -35,7 +35,7 @@ hechuan_dual_arm = ArticulationCfg(
     actuators={
         "arm": ImplicitActuatorCfg(
             joint_names_expr=["right_j1","right_j2","right_j3","right_j4","right_j5","right_j6","right_j7"],
-            velocity_limit=1,
+            velocity_limit=0.2,
             effort_limit={
                 "right_j1": 100,
                 "right_j2": 100,
