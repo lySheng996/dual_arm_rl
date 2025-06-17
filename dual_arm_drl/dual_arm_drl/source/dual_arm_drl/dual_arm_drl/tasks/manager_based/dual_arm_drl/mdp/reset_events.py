@@ -44,8 +44,8 @@ def reset_spec_joints_by_uniform(
             pos_range = position_ranges[joint_name]
             joint_pos_radom[:, i] += math_utils.sample_uniform(*pos_range, joint_pos_radom[:, i].shape, joint_pos_radom.device)
     # clamp joint pos to limits
-    for i in range(30):
-        joint_pos_radom=joint_pos_radom/30
+    joint_pos_radom=joint_pos_radom/50
+    for i in range(50):
         joint_pos_send += joint_pos_radom
         asset.write_joint_position_to_sim(joint_pos_send,_joint_ids)
     # print("reset_spec_joints_by_uniform: joint_ids:", _joint_ids)
